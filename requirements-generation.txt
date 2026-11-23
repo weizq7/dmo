@@ -1,0 +1,9 @@
+# Install torch==2.8.0 from the cu128 index using the README first.
+transformers==5.17.0
+huggingface-hub==1.33.0
+tokenizers==0.23.3
+pyarrow==23.0.1
+numpy==2.5.4
+scikit-learn==1.9.1
+mauve-text==0.4.0
+faiss-cpu==1.12.0

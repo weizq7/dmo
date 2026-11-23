@@ -221,8 +221,52 @@ bash scripts/evaluate_135m.sh vanilla_dmo_entropy
 bash scripts/evaluate_135m.sh vanilla_soft_entropy
 ```
 
+## Comparing Three Text-Generation Modes
+
+Use the environment and validation data prepared above. Generation requires
+NVIDIA A100 GPUs and CUDA Toolkit 12.6 or 12.8 with `nvcc`.
+
+Install the additional dependencies and prepare the shared inputs once:
+
+```bash
+python -m pip install -r requirements-generation.txt
+
+python scripts/prepare_generation.py \
+  --val-data "$PWD/data/fineweb-edu-shuffled/data/val/train" \
+  --output "$PWD/data/generation"
+```
+
+Run the commands below one at a time from the repository root on eight
+exclusively allocated A100 GPUs. Each evaluates the corresponding training
+run's `checkpoints/step_0022000.pt` with three modes and three seeds on the
+same 5,000 prompts (45,000 generations).
+
+- Mode 0: Compute all eight loops, sample a depth from the exact exit distribution, then sample from that depth's vocabulary distribution.
+- Mode 1: Sample the exit online, emit the token, and complete the remaining loops in the background to obtain exact KV.
+- Mode 2: Sample the exit online and reuse that depth's same-layer KV at deeper depths.
+
+```bash
+# GRT + DMO
+bash scripts/generate_135m.sh grt_dmo
+
+# GRT + soft loss + exit-distribution entropy regularization
+bash scripts/generate_135m.sh grt_soft_entropy
+
+# Vanilla + DMO
+bash scripts/generate_135m.sh vanilla_dmo
+
+# Vanilla + soft loss + exit-distribution entropy regularization
+bash scripts/generate_135m.sh vanilla_soft_entropy
+```
+
+Each mode's {MAUVE, latency, compute} results are saved to
+`analysis/generation/<run-key>/RESULTS.md` and `summary.json`. Override
+`RUN_ROOT`, `GENERATION_DATA`, or `GENERATION_ROOT` for different paths. Set
+`NPROC_PER_NODE` and `CUDA_VISIBLE_DEVICES` to use fewer GPUs.
+
 ## Acknowledgements
 
 This repository builds on the [LoopLM](https://github.com/rkstgr/LoopLM)
 codebase. We also thank the authors of [Parcae](https://github.com/sandyresearch/parcae)
-for their evaluation tools and resources.
+for their evaluation tools and resources. Text-generation quality evaluation
+uses the official [MAUVE](https://github.com/krishnap25/mauve) implementation.

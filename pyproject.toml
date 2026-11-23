@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
 [project]
 name = "dmo"
 version = "0.1.0"
@@ -19,3 +23,9 @@ dev = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"assets/generation" = "assets/generation"
+"scripts/evaluate_generation.py" = "scripts/evaluate_generation.py"
+"scripts/prepare_generation.py" = "scripts/prepare_generation.py"
+"scripts/generate_135m.sh" = "scripts/generate_135m.sh"

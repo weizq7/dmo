@@ -30,6 +30,8 @@ htmlcov/
 checkpoints/
 runs/
 outputs/
+analysis/
+.cache/
 wandb/
 *.pt
 *.pth

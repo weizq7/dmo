@@ -1,0 +1,16 @@
+{
+  "dataset": "SandyResearch/fineweb-edu-shuffled",
+  "split_directory": "data/val/train",
+  "count": 5000,
+  "prompt_tokens": 64,
+  "reference_tokens": 512,
+  "tokenizer_id": "HuggingFaceTB/SmolLM2-135M",
+  "tokenizer_revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+  "manifest_sha256": "80d2c660098a8c6bf1b69bbe995248cdb495532367b8e9e5ea3a86099d7a0f42",
+  "selection_sha256": "f62883005c28dd3297303b20761b073d2cc23f00ff91ea371067894d6b859ad0",
+  "selection_seed": 20261121,
+  "candidate_count": 20000,
+  "training_overlap_filter": "whitespace-normalized full-document SHA-256",
+  "training_shards_audited": 1823,
+  "training_rows_audited": 97230848
+}

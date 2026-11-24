@@ -263,6 +263,7 @@ Each mode's {MAUVE, latency, compute} results are saved to
 `analysis/generation/<run-key>/RESULTS.md` and `summary.json`. Override
 `RUN_ROOT`, `GENERATION_DATA`, or `GENERATION_ROOT` for different paths. Set
 `NPROC_PER_NODE` and `CUDA_VISIBLE_DEVICES` to use fewer GPUs.
+Set `MAUVE_WORKERS` and `MAUVE_THREADS` to adjust CPU scoring parallelism.
 
 ## Acknowledgements
 

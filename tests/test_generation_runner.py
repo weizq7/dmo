@@ -103,6 +103,9 @@ def test_lifecycle_finishes_all_stages_or_stops_own_workers(
         active["action"] = action
         launched.append(action)
         if action == "score":
+            assert kwargs["env"]["CUDA_VISIBLE_DEVICES"] == ""
+            assert kwargs["env"]["OMP_NUM_THREADS"] == "1"
+            assert kwargs["env"]["MKL_NUM_THREADS"] == "1"
             (output / "summary.json").write_text(
                 json.dumps(dict(per_seed=[dict(n=5000)] * 9))
             )

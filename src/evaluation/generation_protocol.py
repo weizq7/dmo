@@ -28,6 +28,7 @@ VERSIONS = {
     "scikit-learn": "1.9.1",
     "mauve-text": "0.4.0",
     "faiss-cpu": "1.12.0",
+    "threadpoolctl": "3.7.0",
 }
 MAUVE = dict(
     num_buckets=500,

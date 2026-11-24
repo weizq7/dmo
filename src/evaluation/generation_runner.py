@@ -357,8 +357,9 @@ def run(args):
                         if job["action"] == "score":
                             env.update(
                                 CUDA_VISIBLE_DEVICES="",
-                                OMP_NUM_THREADS="8",
-                                MKL_NUM_THREADS="8",
+                                OMP_NUM_THREADS="1",
+                                MKL_NUM_THREADS="1",
+                                OMP_WAIT_POLICY="PASSIVE",
                             )
                         children.append(
                             subprocess.Popen(

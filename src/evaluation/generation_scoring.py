@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import time
 
 import numpy as np
 
 from .generation_metrics import text_hash, generation_metrics, mean_sd, display_mean_sd
+from .mauve_cpu import score_feature_sets
 from .generation_protocol import (
     SEEDS,
     MODES,
@@ -319,16 +321,13 @@ def write_report(output, summary):
 
 
 def aggregate_job(experiment, output):
-    import faiss
-    import mauve
-
-    faiss.omp_set_num_threads(8)
+    started = time.monotonic()
     output = Path(output)
     manifest = load_manifest(experiment["paths"]["manifest"])
     p, p_lengths = read_features(
         output, experiment, "reference", [r["human_text"] for r in manifest]
     )
-    scores, equivalence = [], []
+    scores, equivalence, feature_jobs = [], [], []
     for seed in SEEDS:
         baseline = load_records(output, experiment, 0, seed)
         exact = load_records(output, experiment, 1, seed)
@@ -345,23 +344,24 @@ def aggregate_job(experiment, output):
             q, q_lengths = read_features(
                 output, experiment, name, [r["full_text"] for r in rows]
             )
-            print(f"SCORING {name}", flush=True)
-            result = mauve.compute_mauve(
-                p_features=p, q_features=q, verbose=False, **SCORER_PROTOCOL["mauve"]
-            )
+            feature_jobs.append((name, q))
             row = dict(
                 mode=mode,
                 seed=seed,
                 n=len(rows),
-                mauve=float(result.mauve),
-                mauve_star=float(result.mauve_star),
                 **generation_metrics(rows),
                 reference_feature_truncation_rate=float(np.mean(p_lengths > 1024)),
                 generated_feature_truncation_rate=float(np.mean(q_lengths > 1024)),
             )
             scores.append(row)
+            print(f"METRICS_READY {name}", flush=True)
+    quality, runtime = score_feature_sets(p, feature_jobs, SCORER_PROTOCOL["mauve"])
+    for row in scores:
+        row.update(quality[f"mode{row['mode']}_seed{row['seed']}"])
     summary = summarize(scores, equivalence, experiment)
     for row in scores:
         atomic_json(output / f"mode{row['mode']}_seed{row['seed']}_metrics.json", row)
     write_report(output, summary)
+    runtime["aggregate_seconds"] = time.monotonic() - started
+    atomic_json(output / "aggregation_runtime.json", runtime)
     print("SCORING_COMPLETE", flush=True)
